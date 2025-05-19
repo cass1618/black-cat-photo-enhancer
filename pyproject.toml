@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling >= 1.26"]
+build-backend = "hatchling.build"
+
+[project]
+name = "black-cat-photo-enhancer"
+version = "0.0.1"
+description = "Python module containing image enhancement methods useful for photos of black cats"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = { text = "MIT" }
+
+[project.urls]
+Homepage = "https://github.com/cass1618/black-cat-photo-enhancer"
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/blackCat"]
+
+[tool.hatch.build.include]
+"src/blackCat/images/*.jpg" = "blackCat/images/"
