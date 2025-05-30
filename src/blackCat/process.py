@@ -1,12 +1,14 @@
 from importlib.resources import files
 import os
-from skimage import io
+from skimage import io, img_as_ubyte
+from skimage.transform import resize
 from matplotlib import pyplot
 from .methods import *
+#from methods import *
 import random
 
 
-def test_method(method, n=1, set=0, local=False, target=None):
+def test_method(method, n=1, set=0, local=False, target=None, low_res=False):
     """
     Applies specified method to a set of test images
 
@@ -39,24 +41,19 @@ def test_method(method, n=1, set=0, local=False, target=None):
         ]
 
     images = [io.imread(path) for path in paths]
-    processed = [method(img) for img in images]
+    if low_res:
+        images = [
+            img_as_ubyte(resize(img, (128, 128), anti_aliasing=True))
+            for img in images
+        ]
 
+    processed = []
+    for i in range(n):
+        with tqdm(total=1, desc=f"Processing image {i+1}") as pbar:
+            processed.append(method(images[i]))
+            pbar.update(1)
 
-    with tqdm(total=1, desc="Processing image 1") as pbar1:
-        processed.append(method(images[0]))
-        pbar1.update(1)
-
-    if(n > 1):
-        with tqdm(total=1, desc="Processing image 2") as pbar2:
-            processed.append(method(images[1]))
-            pbar2.update(1)
-
-    if(n > 2):
-        with tqdm(total=1, desc="Processing image 3") as pbar3:
-            processed.append(method(images[2]))
-            pbar3.update(1)
-
-    fig, ax = pyplot.subplots(n, 2, figsize=(3, 2 * n))
+    fig, ax = pyplot.subplots(n, 2, figsize=(6, 3 * n))
 
     if(n > 1):
         for i in range(n):
@@ -75,9 +72,8 @@ def test_method(method, n=1, set=0, local=False, target=None):
         fig.savefig(target, bbox_inches='tight', dpi=300)
     pyplot.show()
 
-    return processed
 
-def load_display(method, path, target):
+def load_display(method, path, target=None):
     img = io.imread(path)
     processed = method(img)
     cmap = 'gray' if processed.ndim == 2 else None
@@ -95,6 +91,6 @@ def load_display(method, path, target):
     return processed
 
 # uncomment for local testing
-# test_method(lab_clahe, 1, 0, True, 'img100.jpg')
+# test_method(lab_clahe, 3, 0, True, low_res=True)
 # load_display(bpdhe, 'src/blackCat/images/img3.jpg')
 # yolo('src/blackCat/images/img3.jpg')
