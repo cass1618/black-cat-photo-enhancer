@@ -5,7 +5,7 @@ import cv2
 
 
 # provided by @vivaciousvivvy
-def yolo(image):
+def yolo_scaled(image):
     """
     Segments image using YOLOv8 to separate the cat from the background
     
@@ -66,7 +66,7 @@ def yolo(image):
 
 
 # modified version of yolo that returns the mask rather than segmented photo
-def get_mask(image):
+def get_mask_scaled(image):
     """
     Segments image using YOLOv8 to separate the cat from the background
     
@@ -106,6 +106,122 @@ def get_mask(image):
             cv2.fillPoly(mask_image, [xy_scaled], color=255)
 
     return mask_image
+
+
+def yolo_unscaled(image):
+    # Sourced from chatgpt using the prompt: Proivde an example of segmentation with a black cat using YOLO
+    # Load YOLOv8 model with segmentation capability
+    model = YOLO('yolov8x-seg.pt')  # You can use yolov8n-seg.pt for a smaller model
+
+    # Run inference
+    results = model(image)[0]
+
+    # Get class names and masks
+    class_names = model.names
+    cat_class_id = [k for k, v in class_names.items() if v == 'cat']
+    if not cat_class_id:
+        print("No 'cat' class in the model.")
+        exit()
+
+    cat_class_id = cat_class_id[0]
+    cat_masks = [mask for i, mask in enumerate(results.masks.data) if int(results.boxes.cls[i]) == cat_class_id]
+
+    if not cat_masks:
+        print("No cat detected.")
+        exit()
+
+    # Convert the PyTorch tensor mask to numpy
+    cat_mask = cat_masks[0].cpu().numpy()
+
+    # Resize mask if needed to match image size
+    mask_resized = cv2.resize(cat_mask.astype(np.uint8), (image.shape[1], image.shape[0]))
+
+    # Apply mask to the image
+    cat_pixels = cv2.bitwise_and(image, image, mask=mask_resized)
+
+    return cat_pixels
+
+
+def get_mask_unscaled(image):
+    # Load YOLOv8 model with segmentation capability
+    model = YOLO('yolov8x-seg.pt')  # You can use yolov8n-seg.pt for a smaller model
+
+    # Run inference
+    results = model(image)[0]
+
+    # Get class names and masks
+    class_names = model.names
+    cat_class_id = [k for k, v in class_names.items() if v == 'cat']
+    if not cat_class_id:
+        print("No 'cat' class in the model.")
+        exit()
+
+    cat_class_id = cat_class_id[0]
+    cat_masks = [mask for i, mask in enumerate(results.masks.data) if int(results.boxes.cls[i]) == cat_class_id]
+
+    if not cat_masks:
+        print("No cat detected.")
+        exit()
+
+    # Convert the PyTorch tensor mask to numpy
+    cat_mask = cat_masks[0].cpu().numpy()
+
+    # Resize mask if needed to match image size
+    mask_resized = cv2.resize(cat_mask.astype(np.uint8), (image.shape[1], image.shape[0]))
+    return mask_resized
+
+
+def negative_transform_unscaled(image):
+    neg_img = 255 - image
+    mask = get_mask_unscaled(image)
+    neg_final = image.copy()
+    for c in range(3):  # assuming image has 3 channels
+        neg_final[:, :, c] = np.where(mask == 1, neg_img[:, :, c], image[:, :, c])
+    return neg_final
+
+
+def gamma_transform_unscaled(image):
+    gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
+    mask = get_mask_unscaled(image)
+    gamma_final = image.copy()
+    for c in range(3):
+        gamma_final[:, :, c] = np.where(mask == 1, gamma_img[:, :, c], image[:, :, c])
+    return gamma_final
+
+
+def log_transform_unscaled(image):
+    log_img = exposure.adjust_log(image, gain=2, inv=False)
+    mask = get_mask_unscaled(image)
+    log_final = image.copy()
+    for c in range(3):  # assuming image has 3 channels
+        log_final[:, :, c] = np.where(mask == 1, log_img[:, :, c], image[:, :, c])
+    return log_final
+
+
+def log_transform_scaled(image):
+    log_img = exposure.adjust_log(image, gain=2, inv=False)
+    mask = get_mask_scaled(image)
+    log_final = image.copy()
+    for c in range(3):  # assuming image has 3 channels
+        log_final[:, :, c] = np.where(mask == 255, log_img[:, :, c], image[:, :, c])
+    return log_final
+
+def negative_transform_scaled(image):
+    neg_img = 255 - image
+    mask = get_mask_scaled(image)
+    neg_final = image.copy()
+    for c in range(3):  # assuming image has 3 channels
+        neg_final[:, :, c] = np.where(mask == 255, neg_img[:, :, c], image[:, :, c])
+    return neg_final
+
+
+def gamma_transform_scaled(image):
+    gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
+    mask = get_mask_scaled(image)
+    gamma_final = image.copy()
+    for c in range(3):
+        gamma_final[:, :, c] = np.where(mask == 255, gamma_img[:, :, c], image[:, :, c])
+    return gamma_final
 
 
 # written by @ruspedpdx
