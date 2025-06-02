@@ -97,3 +97,5 @@ def load_display(method, path, target=None):
 # test_method(lab_clahe, 1, 35, True, 'img41.jpg')
 # load_display(bpdhe, 'src/blackCat/images/img3.jpg')
 # bpdhe('src/blackCat/images/img3.jpg')
+# img = gamma_transform_scaled('src/blackCat/images/img7.jpg')
+# print(type(img))

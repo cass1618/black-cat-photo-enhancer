@@ -18,7 +18,7 @@ def yolo_scaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(yolo_scaled, path)
+        return load_display(yolo_scaled, path)
         
     else:
         # Sourced from chatgpt using the prompt: Proivde an example of segmentation with a black cat using YOLO where the image size is 3024 x 4032
@@ -112,7 +112,7 @@ def yolo_unscaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(yolo_unscaled, path)
+        return load_display(yolo_unscaled, path)
     # Sourced from chatgpt using the prompt: Proivde an example of segmentation with a black cat using YOLO
     # Load YOLOv8 model with segmentation capability
     else:
@@ -181,7 +181,7 @@ def negative_transform_unscaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(negative_transform_unscaled, path)
+        return load_display(negative_transform_unscaled, path)
     
     else:
         neg_img = 255 - image
@@ -196,7 +196,7 @@ def gamma_transform_unscaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(gamma_transform_unscaled, path)
+        return load_display(gamma_transform_unscaled, path)
     
     else:
         gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
@@ -211,7 +211,7 @@ def log_transform_unscaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(log_transform_unscaled, path)
+        return load_display(log_transform_unscaled, path)
     
     else:
         log_img = exposure.adjust_log(image, gain=2, inv=False)
@@ -226,7 +226,7 @@ def log_transform_scaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(log_transform_scaled, path)
+        return load_display(log_transform_scaled, path)
     
     else:
         log_img = exposure.adjust_log(image, gain=2, inv=False)
@@ -240,7 +240,7 @@ def negative_transform_scaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(negative_transform_scaled, path)
+        return load_display(negative_transform_scaled, path)
     
     else:
         neg_img = 255 - image
@@ -255,7 +255,7 @@ def gamma_transform_scaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(gamma_transform_scaled, path)
+        return load_display(gamma_transform_scaled, path)
     
     else:
         gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
@@ -280,7 +280,7 @@ def bpdhe(image):
     if isinstance(image, str):
         from process import load_display
         path = image
-        load_display(bpdhe, path)
+        return load_display(bpdhe, path)
         
     else:
 
@@ -311,7 +311,7 @@ def lab_clahe(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(lab_clahe, path)
+        return load_display(lab_clahe, path)
         
     else:
         # obtain portion of photo that includes only the cat
