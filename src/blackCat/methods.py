@@ -18,7 +18,7 @@ def yolo_scaled(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(yolo, path)
+        load_display(yolo_scaled, path)
         
     else:
         # Sourced from chatgpt using the prompt: Proivde an example of segmentation with a black cat using YOLO where the image size is 3024 x 4032
@@ -109,40 +109,46 @@ def get_mask_scaled(image):
 
 
 def yolo_unscaled(image):
+    if isinstance(image, str):
+        from .process import load_display
+        path = image
+        load_display(yolo_unscaled, path)
     # Sourced from chatgpt using the prompt: Proivde an example of segmentation with a black cat using YOLO
     # Load YOLOv8 model with segmentation capability
-    model = YOLO('yolov8x-seg.pt')  # You can use yolov8n-seg.pt for a smaller model
+    else:
+        model = YOLO('yolov8x-seg.pt')  # You can use yolov8n-seg.pt for a smaller model
 
-    # Run inference
-    results = model(image)[0]
+        # Run inference
+        results = model(image)[0]
 
-    # Get class names and masks
-    class_names = model.names
-    cat_class_id = [k for k, v in class_names.items() if v == 'cat']
-    if not cat_class_id:
-        print("No 'cat' class in the model.")
-        exit()
+        # Get class names and masks
+        class_names = model.names
+        cat_class_id = [k for k, v in class_names.items() if v == 'cat']
+        if not cat_class_id:
+            print("No 'cat' class in the model.")
+            exit()
 
-    cat_class_id = cat_class_id[0]
-    cat_masks = [mask for i, mask in enumerate(results.masks.data) if int(results.boxes.cls[i]) == cat_class_id]
+        cat_class_id = cat_class_id[0]
+        cat_masks = [mask for i, mask in enumerate(results.masks.data) if int(results.boxes.cls[i]) == cat_class_id]
 
-    if not cat_masks:
-        print("No cat detected.")
-        exit()
+        if not cat_masks:
+            print("No cat detected.")
+            exit()
 
-    # Convert the PyTorch tensor mask to numpy
-    cat_mask = cat_masks[0].cpu().numpy()
+        # Convert the PyTorch tensor mask to numpy
+        cat_mask = cat_masks[0].cpu().numpy()
 
-    # Resize mask if needed to match image size
-    mask_resized = cv2.resize(cat_mask.astype(np.uint8), (image.shape[1], image.shape[0]))
+        # Resize mask if needed to match image size
+        mask_resized = cv2.resize(cat_mask.astype(np.uint8), (image.shape[1], image.shape[0]))
 
-    # Apply mask to the image
-    cat_pixels = cv2.bitwise_and(image, image, mask=mask_resized)
+        # Apply mask to the image
+        cat_pixels = cv2.bitwise_and(image, image, mask=mask_resized)
 
-    return cat_pixels
+        return cat_pixels
 
 
 def get_mask_unscaled(image):
+    
     # Load YOLOv8 model with segmentation capability
     model = YOLO('yolov8x-seg.pt')  # You can use yolov8n-seg.pt for a smaller model
 
@@ -172,56 +178,92 @@ def get_mask_unscaled(image):
 
 
 def negative_transform_unscaled(image):
-    neg_img = 255 - image
-    mask = get_mask_unscaled(image)
-    neg_final = image.copy()
-    for c in range(3):  # assuming image has 3 channels
-        neg_final[:, :, c] = np.where(mask == 1, neg_img[:, :, c], image[:, :, c])
-    return neg_final
+    if isinstance(image, str):
+        from .process import load_display
+        path = image
+        load_display(negative_transform_unscaled, path)
+    
+    else:
+        neg_img = 255 - image
+        mask = get_mask_unscaled(image)
+        neg_final = image.copy()
+        for c in range(3):  # assuming image has 3 channels
+            neg_final[:, :, c] = np.where(mask == 1, neg_img[:, :, c], image[:, :, c])
+        return neg_final
 
 
 def gamma_transform_unscaled(image):
-    gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
-    mask = get_mask_unscaled(image)
-    gamma_final = image.copy()
-    for c in range(3):
-        gamma_final[:, :, c] = np.where(mask == 1, gamma_img[:, :, c], image[:, :, c])
-    return gamma_final
+    if isinstance(image, str):
+        from .process import load_display
+        path = image
+        load_display(gamma_transform_unscaled, path)
+    
+    else:
+        gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
+        mask = get_mask_unscaled(image)
+        gamma_final = image.copy()
+        for c in range(3):
+            gamma_final[:, :, c] = np.where(mask == 1, gamma_img[:, :, c], image[:, :, c])
+        return gamma_final
 
 
 def log_transform_unscaled(image):
-    log_img = exposure.adjust_log(image, gain=2, inv=False)
-    mask = get_mask_unscaled(image)
-    log_final = image.copy()
-    for c in range(3):  # assuming image has 3 channels
-        log_final[:, :, c] = np.where(mask == 1, log_img[:, :, c], image[:, :, c])
-    return log_final
+    if isinstance(image, str):
+        from .process import load_display
+        path = image
+        load_display(log_transform_unscaled, path)
+    
+    else:
+        log_img = exposure.adjust_log(image, gain=2, inv=False)
+        mask = get_mask_unscaled(image)
+        log_final = image.copy()
+        for c in range(3):  # assuming image has 3 channels
+            log_final[:, :, c] = np.where(mask == 1, log_img[:, :, c], image[:, :, c])
+        return log_final
 
 
 def log_transform_scaled(image):
-    log_img = exposure.adjust_log(image, gain=2, inv=False)
-    mask = get_mask_scaled(image)
-    log_final = image.copy()
-    for c in range(3):  # assuming image has 3 channels
-        log_final[:, :, c] = np.where(mask == 255, log_img[:, :, c], image[:, :, c])
-    return log_final
+    if isinstance(image, str):
+        from .process import load_display
+        path = image
+        load_display(log_transform_scaled, path)
+    
+    else:
+        log_img = exposure.adjust_log(image, gain=2, inv=False)
+        mask = get_mask_scaled(image)
+        log_final = image.copy()
+        for c in range(3):  # assuming image has 3 channels
+            log_final[:, :, c] = np.where(mask == 255, log_img[:, :, c], image[:, :, c])
+        return log_final
 
 def negative_transform_scaled(image):
-    neg_img = 255 - image
-    mask = get_mask_scaled(image)
-    neg_final = image.copy()
-    for c in range(3):  # assuming image has 3 channels
-        neg_final[:, :, c] = np.where(mask == 255, neg_img[:, :, c], image[:, :, c])
-    return neg_final
+    if isinstance(image, str):
+        from .process import load_display
+        path = image
+        load_display(negative_transform_scaled, path)
+    
+    else:
+        neg_img = 255 - image
+        mask = get_mask_scaled(image)
+        neg_final = image.copy()
+        for c in range(3):  # assuming image has 3 channels
+            neg_final[:, :, c] = np.where(mask == 255, neg_img[:, :, c], image[:, :, c])
+        return neg_final
 
 
 def gamma_transform_scaled(image):
-    gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
-    mask = get_mask_scaled(image)
-    gamma_final = image.copy()
-    for c in range(3):
-        gamma_final[:, :, c] = np.where(mask == 255, gamma_img[:, :, c], image[:, :, c])
-    return gamma_final
+    if isinstance(image, str):
+        from .process import load_display
+        path = image
+        load_display(gamma_transform_scaled, path)
+    
+    else:
+        gamma_img = exposure.adjust_gamma(image, gamma=0.5, gain=1)
+        mask = get_mask_scaled(image)
+        gamma_final = image.copy()
+        for c in range(3):
+            gamma_final[:, :, c] = np.where(mask == 255, gamma_img[:, :, c], image[:, :, c])
+        return gamma_final
 
 
 # written by @ruspedpdx
@@ -236,9 +278,9 @@ def bpdhe(image):
         brightness preserved image as grayscale numpy.ndarray
     """
     if isinstance(image, str):
-        from .process import load_display
+        from process import load_display
         path = image
-        load_display(yolo, path)
+        load_display(bpdhe, path)
         
     else:
 
@@ -269,11 +311,11 @@ def lab_clahe(image):
     if isinstance(image, str):
         from .process import load_display
         path = image
-        load_display(yolo, path)
+        load_display(lab_clahe, path)
         
     else:
         # obtain portion of photo that includes only the cat
-        mask = get_mask(image)
+        mask = get_mask_scaled(image)
 
         # convert image from RGB to LAB color space
         lab_image = cv2.cvtColor(image, cv2.COLOR_RGB2LAB)

@@ -3,12 +3,11 @@ import os
 from skimage import io, img_as_ubyte
 from skimage.transform import resize
 from matplotlib import pyplot
-#from .methods import *
-from methods import *
+from .methods import *
 import random
 
 
-def test_method(method, n=1, set=0, local=False, target=None, low_res=False):
+def test(method, n=1, set=0, local=False, target=None, low_res=False):
     """
     Applies specified method to a set of test images
 
@@ -79,7 +78,9 @@ def load_display(method, path, target=None):
     img = io.imread(path)
     processed = method(img)
     cmap = 'gray' if processed.ndim == 2 else None
-    fig, ax = pyplot.subplots(1, 2, figsize=(3, 2))
+    width = img.shape[1]/600
+    height = img.shape[0]/600
+    fig, ax = pyplot.subplots(1, 2, figsize=(width, height))
     ax[0].imshow(img)
     ax[0].axis('off')
     ax[1].imshow(processed, cmap=cmap)
@@ -93,6 +94,6 @@ def load_display(method, path, target=None):
     return processed
 
 # uncomment for local testing
-test_method(lab_clahe, 1, 35, True, 'img41.jpg')
+# test_method(lab_clahe, 1, 35, True, 'img41.jpg')
 # load_display(bpdhe, 'src/blackCat/images/img3.jpg')
-# yolo('src/blackCat/images/img3.jpg')
+# bpdhe('src/blackCat/images/img3.jpg')
