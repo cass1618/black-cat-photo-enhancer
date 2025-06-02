@@ -73,6 +73,32 @@ def test(method, n=1, set=0, local=False, target=None, low_res=False):
         fig.savefig(target, bbox_inches='tight', dpi=300)
     pyplot.show()
 
+def combine(method, image):
+    """
+    Allows applying multiple methods
+
+    Args:
+        method: a method that takes an image as an argument
+        image: RGB image
+    
+    Returns:
+        set of images with method applied
+    """
+
+
+    processed = method(image)
+    cmap = 'gray' if processed.ndim == 2 else None
+    width = image.shape[1]/600
+    height = image.shape[0]/600
+    fig, ax = pyplot.subplots(1, 2, figsize=(width, height))
+    ax[0].imshow(image)
+    ax[0].axis('off')
+    ax[1].imshow(processed, cmap=cmap)
+    ax[1].axis('off')
+    pyplot.tight_layout(pad=0.1)
+
+    return processed
+
 
 def load_display(method, path, target=None):
     img = io.imread(path)
