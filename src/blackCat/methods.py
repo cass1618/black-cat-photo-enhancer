@@ -230,7 +230,7 @@ def bpdhe(image):
     Applies brightness preserving dynamic histogram equalization to an image
     
     Args:
-        image(numpy.ndarray): RBG image
+        image(numpy.ndarray): RGB image
     
     Returns:
         brightness preserved image as grayscale numpy.ndarray
@@ -284,7 +284,7 @@ def lab_clahe(image):
         clahe_obj = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
         clahe_lightness = clahe_obj.apply(lightness)
 
-        # copy the lightness channel and replace segmented portion with clahe version
+        # copy the lightness channel and replace segmented portion
         clahe_lightness_mask = lightness.copy()
         clahe_lightness_mask[mask == 255] = clahe_lightness[mask == 255]
 

@@ -3,8 +3,8 @@ import os
 from skimage import io, img_as_ubyte
 from skimage.transform import resize
 from matplotlib import pyplot
-from .methods import *
-#from methods import *
+#from .methods import *
+from methods import *
 import random
 
 
@@ -53,7 +53,9 @@ def test_method(method, n=1, set=0, local=False, target=None, low_res=False):
             processed.append(method(images[i]))
             pbar.update(1)
 
-    fig, ax = pyplot.subplots(n, 2, figsize=(6, 3 * n))
+    width = max(img.shape[1] for img in images)/600
+    height = max(img.shape[0] for img in images)/600
+    fig, ax = pyplot.subplots(n, 2, figsize=(2 * width, height * n))
 
     if(n > 1):
         for i in range(n):
@@ -66,7 +68,7 @@ def test_method(method, n=1, set=0, local=False, target=None, low_res=False):
         ax[0].axis('off')
         ax[1].imshow(processed[0])
         ax[1].axis('off')
-        pyplot.tight_layout(pad=0.5)
+        pyplot.tight_layout(pad=0.1)
     
     if(target):
         fig.savefig(target, bbox_inches='tight', dpi=300)
@@ -82,7 +84,7 @@ def load_display(method, path, target=None):
     ax[0].axis('off')
     ax[1].imshow(processed, cmap=cmap)
     ax[1].axis('off')
-    pyplot.tight_layout(pad=0.5)
+    pyplot.tight_layout(pad=0.1)
 
     if(target):
         fig.savefig(target, bbox_inches='tight', dpi=300)
@@ -91,6 +93,6 @@ def load_display(method, path, target=None):
     return processed
 
 # uncomment for local testing
-# test_method(lab_clahe, 3, 0, True, low_res=True)
+test_method(lab_clahe, 1, 35, True, 'img41.jpg')
 # load_display(bpdhe, 'src/blackCat/images/img3.jpg')
 # yolo('src/blackCat/images/img3.jpg')
